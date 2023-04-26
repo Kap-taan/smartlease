@@ -4,7 +4,7 @@ import AuthContext from "../components/stores/AuthContext";
 import { db } from "../components/data/firebase";
 import withAuth from "@/components/routes/PrivateRoute";
 import Layout from "@/components/Layout";
-import { Heading, SimpleGrid, Card, Stack, CardBody, CardFooter, Image, Text, Tag, HStack, Badge, Button, Center, Spinner } from '@chakra-ui/react'
+import { Heading, SimpleGrid, Card, Stack, CardBody, CardFooter, Image, Text, Tag, HStack, Badge, Button, Center, Spinner, Alert, AlertIcon } from '@chakra-ui/react'
 import Link from "next/link";
 
 const ViewBooking = () => {
@@ -65,6 +65,10 @@ const ViewBooking = () => {
             <Heading as='h3' size='lg' className="pb-8">
                 Visit status
             </Heading>
+            {!loading && bookings.length === 0 && <Alert status='warning' mb={10}>
+                <AlertIcon />
+                No pending visits
+            </Alert>}
             <SimpleGrid columns={1} spacingX='40px' spacingY='20px'>
                 {!loading && bookings.length > 0 && bookings.map(booking => (
 

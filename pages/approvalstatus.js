@@ -1,10 +1,11 @@
 import Layout from "@/components/Layout";
 import { db } from "@/components/data/firebase";
 import AuthContext from "@/components/stores/AuthContext";
-import { Heading, SimpleGrid, Card, Image, Stack, CardBody, Text, HStack, CardFooter, Button, Tag, Badge } from '@chakra-ui/react';
+import { Heading, SimpleGrid, Card, Image, Stack, CardBody, Text, HStack, CardFooter, Button, Tag, Badge, Alert, AlertIcon } from '@chakra-ui/react';
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
+import withAuth from "@/components/routes/PrivateRoute";
 
 const ApprovalStatus = () => {
 
@@ -20,7 +21,7 @@ const ApprovalStatus = () => {
 
     const getApprovalInformation = async () => {
         try {
-            const q = query(collection(db, "appointed"), where("clientId", "==", user.uid), orderBy("createdAt", "desc"));
+            const q = query(collection(db, "appointed"), where("clientId", "==", user.uid), where("isAppointed", "==", false), orderBy("createdAt", "desc"));
             const response = await getDocs(q);
             let tempApprovals = [];
             response.forEach(doc => {
@@ -29,6 +30,7 @@ const ApprovalStatus = () => {
                     ...doc.data()
                 })
             })
+            console.log(tempApprovals);
             setApprovals(tempApprovals);
         } catch (error) {
             console.log(error);
@@ -46,6 +48,10 @@ const ApprovalStatus = () => {
             <Heading as='h3' size='lg' className="pb-8">
                 Approval status
             </Heading>
+            {!initialLoading && approvals.length === 0 && <Alert status='warning' mb={10}>
+                <AlertIcon />
+                Seems your account has no approval to be continued
+            </Alert>}
             <SimpleGrid columns={1} spacingX='40px' spacingY='20px'>
                 {!loading && approvals.length > 0 && approvals.map(approval => (
 
@@ -103,4 +109,4 @@ const ApprovalStatus = () => {
     )
 }
 
-export default ApprovalStatus;
+export default withAuth(ApprovalStatus);

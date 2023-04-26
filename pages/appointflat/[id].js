@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Container, FormControl, FormLabel, Select, FormHelperText, Heading, Card, CardBody, Text, Tag, Button, Spinner, ButtonGroup, Flex, Alert, AlertIcon, Center, AlertTitle, AlertDescription } from "@chakra-ui/react";
 import { ChevronDownIcon, ArrowForwardIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import { connectStorageEmulator, getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import withAuth from "@/components/routes/PrivateRoute";
 
 const AppointFlat = () => {
 
@@ -107,7 +108,9 @@ const AppointFlat = () => {
             societyName: appointmentData.societyName,
             image: appointmentData.image,
             isRejected: false,
-            createdAt: new Date().getTime()
+            createdAt: new Date().getTime(),
+            blockNo: block.blockNo,
+            bhk: bhk
         };
 
         console.log(data);
@@ -386,4 +389,4 @@ const AppointFlat = () => {
     );
 }
 
-export default AppointFlat;
+export default withAuth(AppointFlat);

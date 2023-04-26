@@ -1,4 +1,5 @@
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, arrayUnion, increment, updateDoc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 import factory from '../../ethereum/factory';
 import web3 from '@/ethereum/web3';
 import { useContext, useEffect, useState } from 'react';
@@ -6,13 +7,18 @@ import { db } from '@/components/data/firebase';
 import Layout from '@/components/Layout';
 import AuthContext from '@/components/stores/AuthContext';
 import { useRouter } from 'next/router';
-import { Heading, Container, Card, CardBody, Center, Alert, AlertIcon, Tag, Spinner, Button, Flex, List, ListItem, ListIcon } from '@chakra-ui/react';
-import { ChevronDownIcon, ArrowForwardIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import { Heading, Container, Card, CardBody, Center, Alert, AlertIcon, Tag, Spinner, Button, Flex, List, ListItem, ListIcon, AlertDescription, AlertTitle } from '@chakra-ui/react';
+import { ChevronDownIcon, ArrowForwardIcon, CheckCircleIcon, RepeatIcon, CheckIcon } from '@chakra-ui/icons';
+import Agreement from '../../ethereum/build/Agreement.json';
+import Link from 'next/link';
+import withAuth from '@/components/routes/PrivateRoute';
 
 const BookFlat = () => {
 
     const router = useRouter();
     const { id } = router.query;
+
+    const { user } = useContext(AuthContext);
 
     const { additionalInfo } = useContext(AuthContext);
 
@@ -26,12 +32,17 @@ const BookFlat = () => {
     const getAppointFlatInfo = async () => {
         const response = await getDoc(doc(db, "appointed", id));
         if (response.exists()) {
-            if (response.data().isVerified === true) {
+            if (response.data().isVerified === true && response.data().isAppointed === false && response.data().isRejected === false) {
                 setFlatInfo(response.data());
                 console.log(response.data());
             } else {
-                console.log('I ran');
-                setError('Approval is not verified');
+                if (response.data().isVerified === false) {
+                    setError('Approval is not verified');
+                } else if (response.data().isAppointed === true) {
+                    setError('Approval is already appointed')
+                } else {
+                    setError('Approval is already rejected');
+                }
             }
         }
         else {
@@ -43,11 +54,12 @@ const BookFlat = () => {
     const agreementHandler = async () => {
         // Chech whether the flat is already alloted or not
         setSteps('Process of Agreement creation is started');
-        setErrorMessage('');
+        setError('');
         setLoading(true);
         const block = flatInfo.blockSelected;
         const floor = flatInfo.floorSelected;
         const room = flatInfo.roomSelected;
+        const blockNo = flatInfo.blockNo;
         console.log(block, floor, room);
         // Get the information of the block
         const response = await getDoc(doc(db, "buildings", block));
@@ -65,7 +77,43 @@ const BookFlat = () => {
                     const response = await factory.methods.createAgreement("gQsectJNClWrpZ5bk8clvdGaOGZ2", "0x51e93DE0da219DF7A404B848DfC56a7F98412769", additionalInfo.name, endDate).send({
                         from: accounts[0]
                     })
-                    console.log(response);
+                    const addresses = await factory.methods.getDeployedAgreements().call();
+                    const address = addresses[addresses.length - 1];
+                    console.log(address);
+                    const instance = new web3.eth.Contract(
+                        JSON.parse(Agreement.interface),
+                        address
+                    );
+                    setSteps('Adding the information about the flat');
+                    await instance.methods.addFlatInfo(room, blockNo, flatInfo.area, flatInfo.city, flatInfo.rent, flatInfo.securityAmount).send({
+                        from: accounts[0]
+                    })
+                    setSteps('Pay the security ddeposit');
+                    await instance.methods.paySecurityDeposit().send({
+                        from: accounts[0],
+                        value: flatInfo.securityAmount.toString(),
+                    })
+                    setSteps('Finalizing the process');
+                    const batch = writeBatch(db);
+
+                    const docRef1 = doc(db, "appointed", id);
+                    batch.update(docRef1, {
+                        isAppointed: true,
+                        contractAddress: address
+                    });
+
+                    const docRef2 = doc(db, "users", user.uid);
+                    batch.update(docRef2, {
+                        rentedFlats: arrayUnion(id)
+                    });
+
+                    const docRef3 = doc(db, "buildings", block);
+                    batch.update(docRef3, {
+                        [`rooms.${floor}.occupiedRooms`]: arrayUnion(room),
+                        [`typesOfFlats.${flatInfo.bhk}.${floor}`]: increment(1)
+                    })
+
+                    await batch.commit();
                 } catch (error) {
                     setError(error.message);
                     console.log(error);
@@ -73,6 +121,11 @@ const BookFlat = () => {
 
                 console.log('DONE');
             }
+        } else {
+            updateDoc(doc(db, "appointed", id), {
+                isRejected: true
+            })
+            setError('Flat is already appointed to someone else :(');
         }
 
         setLoading(false);
@@ -94,7 +147,7 @@ const BookFlat = () => {
                         {error}
                     </Alert>
                 </Container>}
-                {!initialLoading && flatInfo && <Container>
+                {!initialLoading && flatInfo && !steps && <Container>
                     <Card>
                         <CardBody>
                             <Center mb={7}>
@@ -130,15 +183,39 @@ const BookFlat = () => {
             </div>
             {!initialLoading && flatInfo && <div>
                 <Container>
-                    <Flex justifyContent='center'>
-                        <Button type="submit" isDisabled={!!error} isLoading={loading} rightIcon={<ArrowForwardIcon />} colorScheme='blue' variant='outline'>
+                    {!steps && <Flex justifyContent='center'>
+                        <Button onClick={agreementHandler} isDisabled={!!error} isLoading={loading} rightIcon={<ArrowForwardIcon />} colorScheme='blue' variant='outline'>
                             Start the Agreement Process
                         </Button>
-                    </Flex>
+                    </Flex>}
+                    {steps && !loading && !error && <Alert
+                        status='success'
+                        variant='subtle'
+                        flexDirection='column'
+                        alignItems='center'
+                        justifyContent='center'
+                        textAlign='center'
+                        height='200px'
+                        mb={5}
+                    >
+                        <AlertIcon boxSize='40px' mr={0} />
+                        <AlertTitle mt={4} mb={1} fontSize='lg'>
+                            Flat is booked successfully
+                        </AlertTitle>
+                        <AlertDescription maxWidth='sm'>
+                            The agreement has been successfully created and stored on the blockchain
+                        </AlertDescription>
+                    </Alert>}
+                    {steps && <Flex justifyContent='center'>
+                        <Link href="/dashboard"><Button isLoading={loading} loadingText={steps} rightIcon={<CheckIcon />} colorScheme='green' variant='outline'>
+                            Done
+                        </Button>
+                        </Link>
+                    </Flex>}
                 </Container>
             </div>}
         </Layout>
     );
 }
 
-export default BookFlat;
+export default withAuth(BookFlat);

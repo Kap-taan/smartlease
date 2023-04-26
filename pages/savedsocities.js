@@ -1,56 +1,47 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
-import { db } from "../components/data/firebase";
-import AuthContext from '../components/stores/AuthContext';
-import { ClipLoader } from "react-spinners";
-import Link from "next/link";
 import Layout from "@/components/Layout";
-import withAuth from "@/components/routes/PrivateRoute";
+import { db } from "@/components/data/firebase";
+import AuthContext from "@/components/stores/AuthContext";
 import { Card, CardHeader, CardBody, CardFooter, Stack, Heading, Button, Image, Text, SimpleGrid, Spinner, Center, Alert, AlertIcon } from '@chakra-ui/react'
+import { doc, getDoc } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+import Link from "next/link";
+import withAuth from "@/components/routes/PrivateRoute";
 
-const Explore = () => {
 
-    const { user, additionalInfo } = useContext(AuthContext);
+const SavedSocities = () => {
 
-    const [socities, setSocities] = useState([]);
+    const { user } = useContext(AuthContext);
+
     const [loading, setLoading] = useState(true);
+    const [socities, setSocities] = useState();
 
-    const getInfo = async () => {
-        const docQuery = query(collection(db, "socities"), where("city", "==", additionalInfo.city), where("area", "==", additionalInfo.area));
+    const getInformation = async () => {
         try {
-            const response = await getDocs(docQuery);
-            let tempSocities = [];
-            response.forEach(doc => {
-                tempSocities = [...tempSocities, {
-                    id: doc.id,
-                    ...doc.data()
-                }]
-            })
-            setSocities(tempSocities);
+            const response = await getDoc(doc(db, "users", user.uid));
+            if (response.exists()) {
+                setSocities(response.data().savedSociety);
+            }
         } catch (error) {
             console.log(error);
-            setLoading(false);
-            return;
         }
 
         setLoading(false);
     }
 
     useEffect(() => {
-        if (additionalInfo) {
-            getInfo();
-        }
-    }, [additionalInfo])
+        if (user)
+            getInformation();
+    }, [user])
 
     return (
         <Layout>
             <div className="">
                 <Heading as='h3' size='lg' className="pb-8">
-                    Societies
+                    List of saved societies
                 </Heading>
                 {!loading && socities.length === 0 && <Alert status='warning' mb={10}>
                     <AlertIcon />
-                    Seems there are no societies in this area
+                    Seems there are no saved societies
                 </Alert>}
                 <SimpleGrid columns={1} spacingX='40px' spacingY='20px'>
                     {loading && <Center><Spinner
@@ -66,12 +57,12 @@ const Explore = () => {
                             direction={{ base: 'column', sm: 'row' }}
                             overflow='hidden'
                             variant='outline'
-                            key={society.name}
+                            key={society?.name}
                         >
                             <Image
                                 // objectFit='cover'
                                 boxSize='200px'
-                                src={society.image}
+                                src={society?.image}
                                 alt='Caffe Latte'
                             />
 
@@ -86,7 +77,7 @@ const Explore = () => {
 
                                 <CardFooter>
                                     <button className="px-3 py-3 rounded-md text-white bg-[#425b8b]">
-                                        <Link href={`/society/${society.id}`}>More Details</Link>
+                                        <Link href={`/society/${society.societyId}`}>More Details</Link>
                                     </button>
                                 </CardFooter>
                             </Stack>
@@ -99,4 +90,4 @@ const Explore = () => {
     )
 }
 
-export default withAuth(Explore);
+export default withAuth(SavedSocities);

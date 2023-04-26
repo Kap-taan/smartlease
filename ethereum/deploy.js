@@ -5,7 +5,7 @@ const compiledFactory = require('./build/AgreementFactory.json');
 const provider = new HDWalletProvider(
     'reason treat prosper meat eagle earth rate extra that cable emerge fuel',
     // remember to change this to your own phrase!
-    'https://goerli.infura.io/v3/4f6f906d8548415f953a6992e660fb76'
+    'https://sepolia.infura.io/v3/4f6f906d8548415f953a6992e660fb76'
     // remember to change this to your own endpoint!
 );
 const web3 = new Web3(provider);

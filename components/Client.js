@@ -52,7 +52,7 @@ const Client = () => {
                             <Heading size='md'>Change location</Heading>
                         </CardBody>
                         <CardFooter>
-                            <Button><Link href="/explore">View here</Link></Button>
+                            <Button><Link href="/changecity">View here</Link></Button>
                         </CardFooter>
                     </Card>
                     <Card>
@@ -85,7 +85,7 @@ const Client = () => {
                             <Heading size='md'>Rented Flats</Heading>
                         </CardBody>
                         <CardFooter>
-                            <Button><Link href="/explore">View here</Link></Button>
+                            <Button><Link href="/rentedflats">View here</Link></Button>
                         </CardFooter>
                     </Card>
                     <Card>
@@ -96,7 +96,7 @@ const Client = () => {
                             <Heading size='md'>Saved Socities</Heading>
                         </CardBody>
                         <CardFooter>
-                            <Button><Link href="/explore">View here</Link></Button>
+                            <Button><Link href="/savedsocities">View here</Link></Button>
                         </CardFooter>
                     </Card>
                 </SimpleGrid>

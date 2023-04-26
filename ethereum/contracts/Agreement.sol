@@ -116,8 +116,8 @@ contract Agreement {
     }
 
     // Peaceful
-    function finishAgreement() public payable restrictedForBuilder {
-        require(endDate < block.timestamp);
+    function finishAgreement() public payable {
+        require(endDate < (block.timestamp * 1000));
         tenant.tenantAccount.transfer(address(this).balance);
         isFinished = true;
     }
