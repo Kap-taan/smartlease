@@ -4,8 +4,7 @@ import AuthContext from "../components/stores/AuthContext";
 import { db } from "../components/data/firebase";
 import withAuth from "@/components/routes/PrivateRoute";
 import Layout from "@/components/Layout";
-import { Heading, SimpleGrid, Card, Stack, CardBody, CardFooter, Image, Text, Tag, HStack, Badge, Button, Center } from '@chakra-ui/react'
-import { ButtonGroup, Spinner } from "react-bootstrap";
+import { Heading, SimpleGrid, Card, Stack, CardBody, CardFooter, Image, Text, Tag, HStack, Badge, Button, Center, Spinner } from '@chakra-ui/react'
 import Link from "next/link";
 
 const ViewBooking = () => {
