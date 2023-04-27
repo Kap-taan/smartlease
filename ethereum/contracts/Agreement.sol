@@ -75,10 +75,10 @@ contract Agreement {
         owner = ownerTemp;
         tenant = tenantTemp;
         isSecurityDepositSubmitted = false;
-        startedDate = block.timestamp;
+        startedDate = block.timestamp * 1000;
         endDate = _endDate;
         isFinished = false;
-        uptoRentSubmitted = block.timestamp;
+        uptoRentSubmitted = block.timestamp * 1000;
     }
 
     // Information about the flat

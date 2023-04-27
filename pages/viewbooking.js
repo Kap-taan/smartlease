@@ -13,11 +13,10 @@ const ViewBooking = () => {
 
     const [bookings, setBookings] = useState([]);
     const [rejectLoading, setRejectLoading] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     const getBookingDetails = async () => {
-        setLoading(true);
         const q = query(collection(db, "appointments"), where("uid", "==", user.uid), where("isRejected", "==", false), orderBy("date", "desc"));
         try {
             const response = await getDocs(q);

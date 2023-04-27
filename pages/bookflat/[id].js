@@ -7,7 +7,7 @@ import { db } from '@/components/data/firebase';
 import Layout from '@/components/Layout';
 import AuthContext from '@/components/stores/AuthContext';
 import { useRouter } from 'next/router';
-import { Heading, Container, Card, CardBody, Center, Alert, AlertIcon, Tag, Spinner, Button, Flex, List, ListItem, ListIcon, AlertDescription, AlertTitle } from '@chakra-ui/react';
+import { Heading, Container, Card, CardBody, Center, Alert, AlertIcon, Tag, Spinner, Button, Flex, List, ListItem, ListIcon, AlertDescription, AlertTitle, Table, Thead, Tbody, Tfoot, Tr, Th, Td, TableCaption, TableContainer, Stat, StatNumber, StatHelpText, StatLabel, StatArrow } from '@chakra-ui/react';
 import { ChevronDownIcon, ArrowForwardIcon, CheckCircleIcon, RepeatIcon, CheckIcon } from '@chakra-ui/icons';
 import Agreement from '../../ethereum/build/Agreement.json';
 import Link from 'next/link';
@@ -26,6 +26,7 @@ const BookFlat = () => {
     const [error, setError] = useState('');
     const [initialLoading, setInitialLoading] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [timer, setTimer] = useState(9);
 
     const [steps, setSteps] = useState('');
 
@@ -113,6 +114,17 @@ const BookFlat = () => {
                         [`typesOfFlats.${flatInfo.bhk}.${floor}`]: increment(1)
                     })
 
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        router.push('/rentedflats');
+                    }, 10000)
+
+                    const interval = setInterval(() => {
+                        setTimer((prevTimerValue) => {
+                            return prevTimerValue - 1;
+                        })
+                    }, 1000)
+
                     await batch.commit();
                 } catch (error) {
                     setError(error.message);
@@ -163,6 +175,10 @@ const BookFlat = () => {
                                 </ListItem>
                                 <ListItem>
                                     <ListIcon as={CheckCircleIcon} color='green.500' />
+                                    Limit of agreement is {flatInfo?.agreementLimit} years
+                                </ListItem>
+                                <ListItem>
+                                    <ListIcon as={CheckCircleIcon} color='green.500' />
                                     The landlord is responsible for maintaining the rental property in good condition, including repairs due to normal wear and tear. The tenant must notify the landlord of any damages or needed repairs in writing within 48 hours of the issue occurring.
                                 </ListItem>
                                 <ListItem>
@@ -202,12 +218,41 @@ const BookFlat = () => {
                         <AlertTitle mt={4} mb={1} fontSize='lg'>
                             Flat is booked successfully
                         </AlertTitle>
-                        <AlertDescription maxWidth='sm'>
+                        {/* <AlertDescription maxWidth='sm'>
                             The agreement has been successfully created and stored on the blockchain
-                        </AlertDescription>
+                        </AlertDescription> */}
                     </Alert>}
+                    {steps && !loading && !error && <div className='flex flex-col justify-center items-center my-4'><Stat>
+                        <StatLabel>Redirect in</StatLabel>
+                        <StatNumber>{timer} seconds</StatNumber>
+                    </Stat></div>}
+                    {steps && !loading && !error && <TableContainer>
+                        <Table variant='simple' w="100%">
+                            <TableCaption>Information about Flat</TableCaption>
+                            <Thead>
+                                <Tr>
+                                    <Th>Name of society</Th>
+                                    <Th>Block No.</Th>
+                                    <Th>Floor No.</Th>
+                                    <Th>Flat No.</Th>
+                                    {/* <Th>City</Th> */}
+                                    {/* <Th>Area</Th> */}
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                <Tr>
+                                    <Td>{flatInfo?.societyName}</Td>
+                                    <Td>{flatInfo?.blockNo}</Td>
+                                    <Td>{flatInfo?.floorSelected}</Td>
+                                    <Td>{flatInfo?.roomSelected}</Td>
+                                    {/* <Td>{flatInfo?.city}</Td> */}
+                                    {/* <Td>{flatInfo?.area}</Td> */}
+                                </Tr>
+                            </Tbody>
+                        </Table>
+                    </TableContainer>}
                     {steps && <Flex justifyContent='center'>
-                        <Link href="/dashboard"><Button isLoading={loading} loadingText={steps} rightIcon={<CheckIcon />} colorScheme='green' variant='outline'>
+                        <Link href="/rentedflats"><Button isLoading={loading} loadingText={steps} rightIcon={<CheckIcon />} colorScheme='green' variant='outline'>
                             Done
                         </Button>
                         </Link>

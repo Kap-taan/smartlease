@@ -5,7 +5,7 @@ import web3 from '@/ethereum/web3';
 import { doc, endAt, getDoc } from "firebase/firestore";
 import { db } from "@/components/data/firebase";
 import Layout from "@/components/Layout";
-import { Card, CardBody, Heading, Image, Spinner, Alert, AlertIcon, Center, Tag, HStack, SimpleGrid, Container, Stack, Divider, CardFooter, ButtonGroup, Button, Highlight } from '@chakra-ui/react'
+import { Card, CardBody, Heading, Image, Spinner, Alert, AlertIcon, Center, Tag, HStack, SimpleGrid, Container, Stack, Divider, CardFooter, ButtonGroup, Button, Highlight, cookieStorageManager } from '@chakra-ui/react'
 import { CalendarIcon, UnlockIcon, MinusIcon, WarningIcon } from '@chakra-ui/icons'
 import withAuth from "@/components/routes/PrivateRoute";
 
@@ -52,17 +52,16 @@ const RentedFlat = () => {
 
     const payRentHandler = async () => {
         setLoading(true);
-        setStage('Process of paying rent is in process');
+        setStage('Process of paying rent is in progress');
         const instance = new web3.eth.Contract(
             JSON.parse(Agreement.interface),
             flatInfo.contractAddress
         );
         try {
-            const now = new Date(uptoRentSubmitted * 1000);
-
+            const now = new Date(uptoRentSubmitted);
             // Add one month to the current date
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
-            const argument = (nextMonth.getTime() / 1000);
+            const argument = nextMonth.getTime();
             // Output the date and time of next month
             const accounts = await web3.eth.getAccounts();
             await instance.methods.payRent(argument).send({
@@ -94,27 +93,32 @@ const RentedFlat = () => {
         let tempuptoRentSubmitted = await instance.methods.getStatus().call();
         tempuptoRentSubmitted = parseInt(tempuptoRentSubmitted);
         setUptoRentSubmitted(tempuptoRentSubmitted);
+        console.log(tempuptoRentSubmitted, new Date().getTime());
+        // IMPORTANT : All work to be done by temp variables
 
-        // All work to be done by temp variables
         // Checking if the agreement is already finished or not
+        console.log('TempisFinished', tempisFinished);
         if (tempisFinished === true) {
             setInitialLoading(false);
             setIsRentDue(false);
             setLoading(false);
+            setNothing(false);
             return;
         }
 
         // Check whether rent is due or not
-        if ((tempuptoRentSubmitted * 1000) < new Date().getTime()) {
+        if ((tempuptoRentSubmitted) < new Date().getTime()) {
             // Rent is overdue
+            console.log('I m here');
             setInitialLoading(false);
             setIsRentDue(true);
             setLoading(false);
+            setNothing(false);
             return;
         }
 
         // Check whether agreement is finished or not
-        if (endDate <= new Date().getTime()) {
+        if (tempendDate < new Date().getTime()) {
             //  Agreement is finished
             try {
                 await instance.methods.finishAgreement().send({
@@ -133,6 +137,7 @@ const RentedFlat = () => {
 
         }
 
+        // No action required
         setInitialLoading(false);
         setIsRentDue(false);
         setLoading(false);

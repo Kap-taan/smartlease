@@ -9,6 +9,7 @@ import Client from "../components/Client";
 import Layout from "@/components/Layout";
 import PrivateAuth from "@/components/routes/PrivateRoute";
 import withAuth from "@/components/routes/PrivateRoute";
+import Builder from "@/components/Builder";
 
 const Dashboard = () => {
 
@@ -40,7 +41,7 @@ const Dashboard = () => {
             <div>
                 {loading && <div className="flex justify-center items-center mt-8"><MoonLoader color="#425b8b" /></div>}
                 {!loading && currentUser && currentUser.role === 'Client' && <Client />}
-                {!loading && currentUser && currentUser.role === 'Builder' && <p className="text-center">Builder Dashboard</p>}
+                {!loading && currentUser && currentUser.role === 'Builder' && <Builder />}
             </div>
         </Layout>
     )
