@@ -11,8 +11,8 @@ const Navbar = () => {
         <div className="pb-9">
             <nav className="flex items-center justify-between">
                 <div className="flex items-center">
-                    <Link href="/" className="w-16"><img className="w-14" src="/logo.svg" alt="Logo" /></Link>
-                    <Link href="/"><h1 className="font-medium">Agreely</h1></Link>
+                    <Link href="/" className="w-16"><img className="w-14" src="/icons/house1.png" alt="Logo" /></Link>
+                    <Link href="/"><h1 className="font-bold">Smart Lease</h1></Link>
                 </div>
                 <ul className="flex">
                     <ButtonGroup spacing={4}>

@@ -110,7 +110,10 @@ const AppointFlat = () => {
             isRejected: false,
             createdAt: new Date().getTime(),
             blockNo: block.blockNo,
-            bhk: bhk
+            bhk: bhk,
+            name: appointmentData.name,
+            email: appointmentData.email,
+            phoneNo: appointmentData.mobileNumber
         };
 
         console.log(data);
@@ -297,7 +300,7 @@ const AppointFlat = () => {
                     </form>}
                     {stage === 'third' && <form onSubmit={floorHandler}>
                         <FormControl mb={9}>
-                            <FormLabel>Type of flat</FormLabel>
+                            <FormLabel>Select the floor</FormLabel>
                             {floors.length > 0 && <Select name="floor" icon={<ChevronDownIcon />}>
                                 {floors && floors.map(floor => (
                                     <option key={floor}>{floor}</option>

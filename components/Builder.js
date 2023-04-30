@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Card, CardHeader, CardBody, CardFooter, SimpleGrid, Heading, Button, Text, Image } from '@chakra-ui/react'
 import { Container } from '@chakra-ui/react'
+import withAuth from "./routes/PrivateRoute";
 
 const Builder = () => {
 
@@ -32,7 +33,7 @@ const Builder = () => {
                             <Heading size='md'>Visit Details</Heading>
                         </CardBody>
                         <CardFooter>
-                            <Button><Link href="/explore">View here</Link></Button>
+                            <Button><Link href="/visitdetails">View here</Link></Button>
                         </CardFooter>
                     </Card>
                     <Card>
@@ -43,7 +44,7 @@ const Builder = () => {
                             <Heading size='md'>Approvals</Heading>
                         </CardBody>
                         <CardFooter>
-                            <Button><Link href="/changecity">View here</Link></Button>
+                            <Button><Link href="/approvals">View here</Link></Button>
                         </CardFooter>
                     </Card>
                     {/* <Card>
@@ -96,4 +97,4 @@ const Builder = () => {
     )
 }
 
-export default Builder;
+export default withAuth(Builder);
