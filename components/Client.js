@@ -12,9 +12,11 @@ const Client = () => {
     const router = useRouter();
 
     useEffect(() => {
+        console.log(additionalInfo);
         if (additionalInfo) {
             if (additionalInfo.name === undefined) {
                 // navigate('/addinfo');
+                console.log('I m here');
                 router.push('/addinfo');
             }
         }
@@ -25,7 +27,7 @@ const Client = () => {
         <div>
             {!additionalInfo && <div className="flex justify-center items-center mt-8"><MoonLoader color="#425b8b" /></div>}
             {additionalInfo && <div className="flex flex-col items-center justify-center">
-                {additionalInfo.city && <p className="mb-12">Hi <span className="text-lg font-bold text-[#425b8b]"> {additionalInfo.name} </span>, Your current city is <span className="text-lg font-bold text-[#425b8b]">{additionalInfo.city.toLocaleUpperCase()} ({additionalInfo.area.toLocaleUpperCase()})</span></p>}
+                {additionalInfo?.city && <p className="mb-12">Hi <span className="text-lg font-bold text-[#425b8b]"> {additionalInfo?.name} </span>, Your current city is <span className="text-lg font-bold text-[#425b8b]">{additionalInfo?.city?.toLocaleUpperCase()} ({additionalInfo.area?.toLocaleUpperCase()})</span></p>}
                 {/* <div>
                     <Link href="/changecity" className="border border-slate-600 px-7 py-3 mb-6 rounded-xl bg-[#425b8b] text-white mt-2 mr-8">Change city</Link>
                     <Link href="/explore" className="border border-slate-600 px-7 py-3 mb-6 rounded-xl bg-[#425b8b] text-white mt-2">Explore flats</Link>

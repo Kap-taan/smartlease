@@ -13,9 +13,11 @@ beforeEach(async () => {
     agreement = await new web3.eth.Contract(JSON.parse(compiledAgreement.interface))
         .deploy({
             data: compiledAgreement.bytecode,
-            arguments: [1, accounts[0], 101, 1, "Sector 62", "Noida", 100, 100, "Anuj Kumar", accounts[1], 1678196255]
+            arguments: ["1", accounts[0], "Anuj Kumar", accounts[1], 1678196255]
         })
-        .send({ from: accounts[0], gas: 1000000 });
+        .send({ from: accounts[1], gas: 1000000 });
+    // 101, 1, "Sector 62", "Noida", 100, 100, 
+    agreement.methods.addFlatInfo(101, 1, "Sector 62", "Noida", 100, 100).send({ from: accounts[1], gas: 1000000 })
 
 });
 
@@ -94,15 +96,26 @@ describe('Agreements', () => {
         }
         assert(error);
     })
-    it('builder can only finish the agreement', async () => {
+    it('builder can also end the agreement', async () => {
         let error;
         try {
-            await agreement.methods.finishAgreement().send({
-                from: accounts[1],
+            await agreement.methods.endAgreement().send({
+                from: accounts[0],
             })
         } catch (err) {
             error = err;
         }
-        assert(error);
+        assert(!error);
+    })
+    it('tenant can also end the agreement', async () => {
+        let error;
+        try {
+            await agreement.methods.endAgreement().send({
+                from: accounts[0],
+            })
+        } catch (err) {
+            error = err;
+        }
+        assert(!error);
     })
 })

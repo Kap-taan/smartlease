@@ -83,12 +83,12 @@ const AddInfo = () => {
                     <input className="border border-slate-600 px-2 py-3 rounded-xl mb-8" type="text" placeholder="Mobile Number" value={mobileNumber} onChange={e => setMobileNumber(e.target.value)} />
                     {cities.length > 0 && <select name="city" onChange={cityChangeHandler} className="border border-slate-600 px-2 py-3 rounded-xl mb-8" placeholder="Current city">
                         {cities.map(city => (
-                            <option key={city.place}>{city.place.toLocaleUpperCase()}</option>
+                            <option key={city.place}>{city?.place?.toLocaleUpperCase()}</option>
                         ))}
                     </select>}
                     {areas.length > 0 && <select name="area" className="border border-slate-600 px-2 py-3 rounded-xl mb-8" placeholder="Current city">
                         {areas.map(area => (
-                            <option key={area}>{area.toLocaleUpperCase()}</option>
+                            <option key={area}>{area?.toLocaleUpperCase()}</option>
                         ))}
                     </select>}
                     {!loading && <button className="border border-slate-600 px-2 py-3 mb-6 rounded-xl bg-[#425b8b] text-white mt-2" type="submit" >Add Info</button>}

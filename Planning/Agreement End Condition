@@ -1,0 +1,13 @@
+## Agreement End Condition
+	[] Overdue of 1 Month
+	[] Tenant v/s Builder ()
+
+	Security Deposit --> No delay
+	Rent information immutable (No conflict on this)
+	Fine imposed
+
+	You could also include a clause that requires the smart contract builder to return a portion of the security deposit to the renters if the agreement is terminated early. This could be based on the amount of time remaining on the agreement or other factors.
+
+	Require a valid reason for termination: The smart contract can include specific reasons that allow the builder to terminate the agreement. These reasons can be limited to circumstances such as non-payment of rent or damage to the property caused by the tenant. By doing so, the builder will not be able to terminate the agreement for any arbitrary reason and the renters will have a clear understanding of what actions can result in termination.
+
+	Lease Link
